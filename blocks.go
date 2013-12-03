@@ -14,7 +14,6 @@ type BlocksService struct {
 
 // A Block is an on demand virtual computing resource.
 type Block struct {
-
 	Id       string
 	Hostname string
 	Ips      []BlockIp
