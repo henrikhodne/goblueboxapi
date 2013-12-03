@@ -2,3 +2,6 @@ language: go
 go:
   - "1.2"
   - "tip"
+matrix:
+  allow_failures:
+    - go: "tip"
