@@ -70,6 +70,38 @@ func TestBlocksService_List(t *testing.T) {
 	}
 }
 
+func TestBlocksService_Get(t *testing.T) {
+	setup()
+	defer teardown()
+
+	output := `{"id": "abcdef", "hostname": "abcdef.example.com", "ips":[{"address":"127.0.0.1"}, {"address": "::1"}], "status":"running"}`
+
+	mux.HandleFunc("/api/blocks/abcdef.json", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		fmt.Fprintf(w, output)
+	})
+
+	block, err := client.Blocks.Get("abcdef")
+
+	if err != nil {
+		t.Errorf("List() err expected to be nil, was %v", err)
+	}
+
+	want := &Block{
+		Id:       "abcdef",
+		Hostname: "abcdef.example.com",
+		Ips: []BlockIp{
+			BlockIp{Address: "127.0.0.1"},
+			BlockIp{Address: "::1"},
+		},
+		Status: "running",
+	}
+
+	if !reflect.DeepEqual(block, want) {
+		t.Errorf("Blocks.Get() returned %+v, want %+v", block, want)
+	}
+}
+
 func TestBlocksService_Create(t *testing.T) {
 	setup()
 	defer teardown()

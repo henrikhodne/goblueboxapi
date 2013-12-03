@@ -90,6 +90,18 @@ func (s *BlocksService) List() ([]Block, error) {
 	return blocks, err
 }
 
+func (s *BlocksService) Get(uuid string) (*Block, error) {
+	req, err := s.client.NewRequest("GET", fmt.Sprintf("/blocks/%s", uuid), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	block := new(Block)
+	err = s.client.Do(req, block)
+
+	return block, err
+}
+
 func (s *BlocksService) Create(p BlockParams) (*Block, error) {
 	if err := p.Validates(); err != nil {
 		return nil, err
