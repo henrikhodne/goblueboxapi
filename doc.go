@@ -1,2 +1,2 @@
-// The goblueboxapi package exposes functionality to interact with the Blue Box API.
+// Package goblueboxapi exposes functionality to interact with the Blue Box API.
 package goblueboxapi

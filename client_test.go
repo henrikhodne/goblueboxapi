@@ -12,7 +12,7 @@ import (
 
 func TestUrlForPath(t *testing.T) {
 	client := NewClient("customer_id", "api_key")
-	u := client.UrlForPath("/foo")
+	u := client.urlForPath("/foo")
 	want, _ := url.Parse("https://boxpanel.bluebox.net/api/foo.json")
 
 	if !reflect.DeepEqual(u, want) {
@@ -23,7 +23,7 @@ func TestUrlForPath(t *testing.T) {
 func TestNewRequest(t *testing.T) {
 	client := NewClient("customer_id", "api_key")
 
-	req, _ := client.NewRequest("GET", "/foo", nil)
+	req, _ := client.newRequest("GET", "/foo", nil)
 
 	if req.URL.Path != "/api/foo.json" {
 		t.Errorf("NewRequest(/foo) URL = %q, want /api/foo.json", req.URL.Path)
@@ -48,9 +48,9 @@ func TestDo(t *testing.T) {
 		fmt.Fprintf(w, `{"Bar":"bar"}`)
 	})
 
-	req, _ := client.NewRequest("GET", "/foo", nil)
+	req, _ := client.newRequest("GET", "/foo", nil)
 	body := new(foo)
-	client.Do(req, body)
+	client.do(req, body)
 
 	want := &foo{"bar"}
 	if !reflect.DeepEqual(body, want) {
@@ -66,8 +66,8 @@ func TestDo_httpError(t *testing.T) {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 	})
 
-	req, _ := client.NewRequest("GET", "/", nil)
-	err := client.Do(req, nil)
+	req, _ := client.newRequest("GET", "/", nil)
+	err := client.do(req, nil)
 
 	if err == nil {
 		t.Error("Expected HTTP 400 error.")
@@ -82,8 +82,8 @@ func TestDo_redirectLoop(t *testing.T) {
 		http.Redirect(w, r, "/", http.StatusFound)
 	})
 
-	req, _ := client.NewRequest("GET", "/", nil)
-	err := client.Do(req, nil)
+	req, _ := client.newRequest("GET", "/", nil)
+	err := client.do(req, nil)
 
 	if err == nil {
 		t.Error("Expected error to be returned.")

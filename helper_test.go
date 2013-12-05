@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	customerId = "customer_id"
+	customerID = "customer_id"
 	apiKey     = "api_key"
 )
 
@@ -22,7 +22,7 @@ func setup() {
 	mux = http.NewServeMux()
 	server = httptest.NewServer(mux)
 
-	client = NewClient(customerId, apiKey)
+	client = NewClient(customerID, apiKey)
 	client.BaseURL, _ = url.Parse(server.URL)
 }
 

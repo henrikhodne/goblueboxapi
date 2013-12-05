@@ -10,7 +10,7 @@ import (
 func TestBlockParams_Validates(t *testing.T) {
 	p := BlockParams{}
 
-	err := p.Validates()
+	err := p.validates()
 	if err == nil {
 		t.Error("BlockParams.Validates() expected to return an error with no params")
 	}
@@ -19,7 +19,7 @@ func TestBlockParams_Validates(t *testing.T) {
 	p.Template = "foobar"
 	p.Password = "foobar"
 	p.SshPublicKey = "foobar"
-	err = p.Validates()
+	err = p.validates()
 	if err == nil {
 		t.Error("BlockParams.Validates() expected to return an error with both password and ssh public key set")
 	}
@@ -47,19 +47,19 @@ func TestBlocksService_List(t *testing.T) {
 
 	want := []Block{
 		Block{
-			Id:       "abcdef",
+			ID:       "abcdef",
 			Hostname: "abcdef.example.com",
-			Ips: []BlockIp{
-				BlockIp{Address: "127.0.0.1"},
-				BlockIp{Address: "::1"},
+			IPs: []BlockIP{
+				BlockIP{Address: "127.0.0.1"},
+				BlockIP{Address: "::1"},
 			},
 			Status: "running",
 		},
 		Block{
-			Id:       "ghijkl",
+			ID:       "ghijkl",
 			Hostname: "ghijkl.example.com",
-			Ips: []BlockIp{
-				BlockIp{Address: "10.0.0.1"},
+			IPs: []BlockIP{
+				BlockIP{Address: "10.0.0.1"},
 			},
 			Status: "queued",
 		},
@@ -88,11 +88,11 @@ func TestBlocksService_Get(t *testing.T) {
 	}
 
 	want := &Block{
-		Id:       "abcdef",
+		ID:       "abcdef",
 		Hostname: "abcdef.example.com",
-		Ips: []BlockIp{
-			BlockIp{Address: "127.0.0.1"},
-			BlockIp{Address: "::1"},
+		IPs: []BlockIP{
+			BlockIP{Address: "127.0.0.1"},
+			BlockIP{Address: "::1"},
 		},
 		Status: "running",
 	}
@@ -131,10 +131,10 @@ func TestBlocksService_Create(t *testing.T) {
 	}
 
 	want := &Block{
-		Id:       "ghijkl",
+		ID:       "ghijkl",
 		Hostname: "ghijkl.example.com",
-		Ips: []BlockIp{
-			BlockIp{Address: "10.0.0.1"},
+		IPs: []BlockIP{
+			BlockIP{Address: "10.0.0.1"},
 		},
 		Status: "queued",
 	}

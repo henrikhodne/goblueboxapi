@@ -14,16 +14,20 @@ type BlocksService struct {
 
 // A Block is an on demand virtual computing resource.
 type Block struct {
-	Id       string
+	ID       string
 	Hostname string
-	Ips      []BlockIp
+	IPs      []BlockIP
 	Status   string
 }
 
-type BlockIp struct {
+// A BlockIP holds an IPv4 or IPv6 address for a block.
+type BlockIP struct {
 	Address string
 }
 
+// BlockParams holds the information needed to boot a block. Product and
+// Template as well as either SshPublicKey or Password (but not both) must be
+// specified.
 type BlockParams struct {
 	Product      string
 	Template     string
@@ -34,24 +38,24 @@ type BlockParams struct {
 	Location     string
 }
 
-func (p BlockParams) Validates() error {
+func (p BlockParams) validates() error {
 	if p.Product == "" {
-		return errors.New(`Must specify "Product"`)
+		return errors.New(`must specify "Product"`)
 	}
 	if p.Template == "" {
-		return errors.New(`Must specify "Template"`)
+		return errors.New(`must specify "Template"`)
 	}
 	if p.Password != "" && p.SshPublicKey != "" {
-		return errors.New(`Only one of "Password" and "SshPublicKey" may be specified`)
+		return errors.New(`only one of "Password" and "SshPublicKey" may be specified`)
 	}
 	if p.Password == "" && p.SshPublicKey == "" {
-		return errors.New(`One of "Password" and "SshPublicKey" must be specified`)
+		return errors.New(`one of "Password" and "SshPublicKey" must be specified`)
 	}
 
 	return nil
 }
 
-func (p BlockParams) ToValues() url.Values {
+func (p BlockParams) toValues() url.Values {
 	v := url.Values{}
 	if p.Product != "" {
 		v.Set("product", p.Product)
@@ -78,51 +82,57 @@ func (p BlockParams) ToValues() url.Values {
 	return v
 }
 
+// List returns the currently running blocks, or an error if there was a problem
+// fetching the information from the API.
 func (s *BlocksService) List() ([]Block, error) {
-	req, err := s.client.NewRequest("GET", "/blocks", nil)
+	req, err := s.client.newRequest("GET", "/blocks", nil)
 	if err != nil {
 		return nil, err
 	}
 
 	var blocks []Block
-	err = s.client.Do(req, &blocks)
+	err = s.client.do(req, &blocks)
 
 	return blocks, err
 }
 
+// Get returns a block given its Id, or an error if there was a problem fetching
+// the information from the API.
 func (s *BlocksService) Get(uuid string) (*Block, error) {
-	req, err := s.client.NewRequest("GET", fmt.Sprintf("/blocks/%s", uuid), nil)
+	req, err := s.client.newRequest("GET", fmt.Sprintf("/blocks/%s", uuid), nil)
 	if err != nil {
 		return nil, err
 	}
 
 	block := new(Block)
-	err = s.client.Do(req, block)
+	err = s.client.do(req, block)
 
 	return block, err
 }
 
+// Create boots a new block with the given parameters, and returns the block.
 func (s *BlocksService) Create(p BlockParams) (*Block, error) {
-	if err := p.Validates(); err != nil {
+	if err := p.validates(); err != nil {
 		return nil, err
 	}
 
-	req, err := s.client.NewRequest("POST", "/blocks", strings.NewReader(p.ToValues().Encode()))
+	req, err := s.client.newRequest("POST", "/blocks", strings.NewReader(p.toValues().Encode()))
 	if err != nil {
 		return nil, err
 	}
 
 	block := new(Block)
-	err = s.client.Do(req, block)
+	err = s.client.do(req, block)
 
 	return block, err
 }
 
+// Destroy shuts down a block.
 func (s *BlocksService) Destroy(uuid string) error {
-	req, err := s.client.NewRequest("DELETE", fmt.Sprintf("/blocks/%s", uuid), nil)
+	req, err := s.client.newRequest("DELETE", fmt.Sprintf("/blocks/%s", uuid), nil)
 	if err != nil {
 		return err
 	}
 
-	return s.client.Do(req, nil)
+	return s.client.do(req, nil)
 }
