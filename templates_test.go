@@ -83,42 +83,65 @@ func TestTemplatesService_Get(t *testing.T) {
 	}
 }
 
-func TestTemplatesService_Create(t *testing.T) {
+func TestTemplatesService_Create_Accepted(t *testing.T) {
 	setup()
 	defer teardown()
 
-	output := `{"id": "abcdef", "description": "foo bar baz", "public": true, "created": "%s"}`
+	output := `{"status": "accepted", "text": "Archive request accepted.  Check template list for completion."}`
 
 	mux.HandleFunc("/api/block_templates.json", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
 
-		// if r.FormValue("product") != "the-product" ||
-		// 	r.FormValue("template") != "the-template" ||
-		// 	r.FormValue("password") != "the-password" ||
-		// 	r.FormValue("ipv6_only") != "true" {
-		// 	t.Error("Blocks.Create() expected to send params, but didn't")
-		// }
+		if r.FormValue("id") != "abcdefg"  {
+			t.Error("Templates.Create() expected to send params, but didn't")
+		}
 
 		fmt.Fprintf(w, output)
 	})
 
-	// params := BlockParams{
-	// 	Product:  "the-product",
-	// 	Template: "the-template",
-	// 	Password: "the-password",
-	// 	IPv6Only: true,
-	// }
-
-	template, err := client.Templates.Create("abcdefg")
+	template, err := client.Templates.Create("abcdefg", "")
 
 	if err != nil {
 		t.Errorf("Templates.Create() returned error: %v", err)
 	}
 
 	want := &TemplateCreationStatus{
-		Status: "abcdef",
-		Text:   "queued",
+		Status: "accepted",
+		Text:   "Archive request accepted.  Check template list for completion.",
 		Error:  0,
+	}
+
+	if !reflect.DeepEqual(template, want) {
+		t.Errorf("Templates.Create() returned %+v, want %+v", template, want)
+	}
+}
+
+func TestTemplatesService_Create_Error(t *testing.T) {
+	setup()
+	defer teardown()
+
+	output := `{"status": "conflict", "text": "Archive job already in progress.", "error": 409}`
+
+	mux.HandleFunc("/api/block_templates.json", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "POST")
+
+		if r.FormValue("id") != "abcdefg"  {
+			t.Error("Templates.Create() expected to send params, but didn't")
+		}
+
+		fmt.Fprintf(w, output)
+	})
+
+	template, err := client.Templates.Create("abcdefg", "")
+
+	if err != nil {
+		t.Errorf("Templates.Create() returned error: %v", err)
+	}
+
+	want := &TemplateCreationStatus{
+		Status: "conflict",
+		Text:   "Archive job already in progress.",
+		Error:  409,
 	}
 
 	if !reflect.DeepEqual(template, want) {

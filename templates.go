@@ -20,6 +20,12 @@ type Template struct {
 	Created     time.Time
 }
 
+type TemplateCreationStatus struct {
+	Status string
+	Text   string
+	Error  int
+}
+
 // List returns the currently known templates, or an error if there
 // was a problem fetching the information from the API.
 func (s *TemplatesService) List() ([]Template, error) {
@@ -49,19 +55,22 @@ func (s *TemplatesService) Get(uuid string) (*Template, error) {
 }
 
 // Create queues a new template for creation from a block uuid.
-func (s *TemplatesService) Create(uuid string) (*Template, error) {
+func (s *TemplatesService) Create(uuid string, description string) (*TemplateCreationStatus, error) {
 	v := url.Values{}
 	v.Set("id", uuid)
+	if description != "" {
+		v.Set("description", description)
+	}
 
 	req, err := s.client.newRequest("POST", "/block_templates", strings.NewReader(v.Encode()))
 	if err != nil {
 		return nil, err
 	}
 
-	template := new(Template)
-	err = s.client.do(req, template)
+	status := new(TemplateCreationStatus)
+	err = s.client.do(req, status)
 
-	return template, err
+	return status, err
 }
 
 // Destroy destroys the template/image.
