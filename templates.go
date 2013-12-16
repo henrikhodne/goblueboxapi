@@ -20,6 +20,7 @@ type Template struct {
 	Created     time.Time
 }
 
+// A rich description of the output when creating a new Template.
 type TemplateCreationStatus struct {
 	Status string
 	Text   string
