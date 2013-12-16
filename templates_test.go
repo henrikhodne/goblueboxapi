@@ -92,7 +92,7 @@ func TestTemplatesService_Create_Accepted(t *testing.T) {
 	mux.HandleFunc("/api/block_templates.json", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
 
-		if r.FormValue("id") != "abcdefg"  {
+		if r.FormValue("id") != "abcdefg" {
 			t.Error("Templates.Create() expected to send params, but didn't")
 		}
 
@@ -125,7 +125,7 @@ func TestTemplatesService_Create_Error(t *testing.T) {
 	mux.HandleFunc("/api/block_templates.json", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "POST")
 
-		if r.FormValue("id") != "abcdefg"  {
+		if r.FormValue("id") != "abcdefg" {
 			t.Error("Templates.Create() expected to send params, but didn't")
 		}
 
